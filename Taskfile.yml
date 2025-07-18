@@ -1,0 +1,173 @@
+version: '3'
+
+# Global variables
+vars:
+  PROJECT_NAME: ejemplo_agentes
+  PYTHON_VERSION: "3.12"
+  UV_CACHE_DIR: .uv-cache
+
+# Global environment variables
+env:
+  UV_CACHE_DIR: "{{.UV_CACHE_DIR}}"
+  PYTEST_XDIST_WORKER_COUNT: "auto"
+
+# Default task when running 'task' without arguments
+tasks:
+  default:
+    desc: "Show available tasks"
+    cmds:
+      - task --list
+
+  # Environment setup tasks
+  setup:
+    desc: "Complete project setup"
+    deps: [install-uv, install-deps, install-pre-commit]
+    cmds:
+      - echo "✅ Project {{.PROJECT_NAME}} setup complete!"
+
+  install-uv:
+    desc: "Install uv if not present"
+    status:
+      - which uv
+    cmds:
+      - curl -LsSf https://astral.sh/uv/install.sh | sh
+      - echo "✅ uv installed"
+
+  install-deps:
+    desc: "Install all dependencies using uv"
+    deps: [install-uv]
+    sources:
+      - pyproject.toml
+      - uv.lock
+    cmds:
+      - uv sync --all-extras
+      - echo "✅ Dependencies installed"
+
+  install-dev:
+    desc: "Install only development dependencies"
+    deps: [install-uv]
+    cmds:
+      - uv sync --only-dev
+      - echo "✅ Development dependencies installed"
+
+  install-pre-commit:
+    desc: "Install pre-commit hooks"
+    deps: [install-deps]
+    status:
+      - test -f .git/hooks/pre-commit
+    cmds:
+      - uv run pre-commit install
+      - echo "✅ Pre-commit hooks installed"
+
+  # Code quality tasks
+  lint:
+    desc: "Run ruff linter"
+    deps: [install-deps]
+    sources:
+      - "*.py"
+      - pyproject.toml
+    cmds:
+      - uv run ruff check .
+
+  lint-fix:
+    desc: "Run ruff linter with auto-fix"
+    deps: [install-deps]
+    cmds:
+      - uv run ruff check --fix .
+      - echo "✅ Linting fixes applied"
+
+  format:
+    desc: "Format code with ruff"
+    deps: [install-deps]
+    sources:
+      - "./*.py"
+    cmds:
+      - uv run ruff format .
+      - echo "✅ Code formatted"
+
+  format-check:
+    desc: "Check code formatting without making changes"
+    deps: [install-deps]
+    cmds:
+      - uv run ruff format --check .
+
+  # Pre-commit tasks
+  pre-commit:
+    desc: "Run pre-commit on all files"
+    deps: [install-pre-commit]
+    cmds:
+      - uv run pre-commit run --all-files
+
+  pre-commit-update:
+    desc: "Update pre-commit hooks"
+    deps: [install-pre-commit]
+    cmds:
+      - uv run pre-commit autoupdate
+      - echo "✅ Pre-commit hooks updated"
+
+  # Combined quality checks
+  check:
+    desc: "Run all quality checks"
+    deps: [lint, format-check]
+    cmds:
+      - echo "✅ All quality checks passed!"
+
+  fix:
+    desc: "Auto-fix all issues"
+    deps: [format, lint-fix]
+    cmds:
+      - echo "✅ All auto-fixes applied!"
+
+  # CI/CD simulation
+  ci:
+    desc: "Run CI pipeline locally"
+    deps: [install-deps]
+    cmds:
+      - task: format-check
+      - task: lint
+      - task: test
+      - task: pre-commit
+      - echo "✅ CI pipeline completed successfully!"
+
+  # Development environment tasks
+  dev-setup:
+    desc: "Setup development environment from scratch"
+    cmds:
+      - task: clean
+      - task: setup
+      - echo "✅ Development environment ready!"
+
+  clean:
+    desc: "Clean up generated files and caches"
+    cmds:
+      - rm -rf .pytest_cache/
+      - rm -rf .coverage
+      - rm -rf htmlcov/
+      - rm -rf {{.UV_CACHE_DIR}}
+      - rm -rf .ruff_cache/
+      - find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
+      - find . -name "*.pyc" -delete 2>/dev/null || true
+      - echo "✅ Cleaned up caches and generated files"
+
+  # Utility tasks
+  deps-outdated:
+    desc: "Check for outdated dependencies"
+    deps: [install-uv]
+    cmds:
+      - uv tree --outdated
+
+  deps-update:
+    desc: "Update all dependencies"
+    deps: [install-uv]
+    cmds:
+      - uv lock --upgrade
+      - uv sync
+      - echo "✅ Dependencies updated"
+
+  # Exec app
+  run:
+    desc: "Execute the app"
+    deps: [install-uv]
+    cmds:
+      - uv sync
+      - uv run streamlit run app.py

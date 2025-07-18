@@ -1,0 +1,13 @@
+# Cache files
+__pycache__
+
+# Envs and variables
+.venv
+.env
+
+# Tasks
+.task
+
+# Cache
+.uv-cache
+.ruff_cache
