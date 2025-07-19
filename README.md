@@ -35,12 +35,12 @@ Este proyecto presenta varias opciones de agentes de cara a entender cómo estos
 
 1. Configurar las variables de entorno necesarias
 
-Crearemos un fichero _.env_ con las credenciales necesarias para Open AI (podéis ver el fichero _.env.example_).
-Actualmente se prioriza la existencia de API de Gemini ya que esta no requiere un método de pago
+   Crearemos un fichero _.env_ con las credenciales necesarias para Open AI (podéis ver el fichero _.env.example_).
+   Actualmente se prioriza la existencia de API de Gemini ya que esta no requiere un método de pago
 
 2. Instalar las dependencias:
 
-Bien empleando `pip`
+   Bien empleando `pip`
    ```bash
    pip install -r requirements.txt
    ```
