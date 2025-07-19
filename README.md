@@ -6,7 +6,7 @@ Este proyecto presenta varias opciones de agentes de cara a entender cómo estos
 
 ### Módulos Principales
 
-1. **<>_app.py**
+1. **geometry_app.py**
    - Punto de entrada principal de la aplicación
    - Implementa la interfaz de usuario con Streamlit
    - Gestiona el historial de chat y la interacción del usuario
@@ -50,8 +50,13 @@ O `uv`
    ```
 3. Ejecutar la aplicación una vez activado el entorno:
    ```bash
-   streamlit run src/<>_app.py
+   streamlit run src/geometry_app.py
    ```
+   o bien mediante `uv run`
+   ```bash
+   uv run streamlit run src/geometry_app.py
+   ```
+
 4. Interactuar con el asistente a través de la interfaz web
 
 ## Ejemplos de Uso
