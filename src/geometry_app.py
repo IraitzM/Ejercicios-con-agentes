@@ -1,5 +1,6 @@
 import streamlit as st
 from streamlit_js_eval import streamlit_js_eval
+
 from agents import create_main_agent
 
 with st.sidebar:
@@ -30,8 +31,6 @@ if prompt := st.chat_input("Type yor query"):
 
     # Display assistant response in chat message container
     with st.chat_message("assistant"):
-        # response = st.write_stream(response_generator())
-
         with st.spinner("Processing ..."):
             response = st.session_state.main_agent.invoke({"input": prompt})
             st.write(response["output"])

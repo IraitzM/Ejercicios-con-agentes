@@ -2,7 +2,8 @@ version: '3'
 
 # Global variables
 vars:
-  PROJECT_NAME: ejemplo_agentes
+  PROJECT_NAME: agent-examples
+  SRC_DIR: src
   PYTHON_VERSION: "3.12"
   UV_CACHE_DIR: .uv-cache
 
@@ -64,32 +65,32 @@ tasks:
     desc: "Run ruff linter"
     deps: [install-deps]
     sources:
-      - "*.py"
+      - "{{.SRC_DIR}}/**/*.py"
       - pyproject.toml
     cmds:
-      - uv run ruff check .
+      - uv run ruff check {{.SRC_DIR}}
 
   lint-fix:
     desc: "Run ruff linter with auto-fix"
     deps: [install-deps]
     cmds:
-      - uv run ruff check --fix .
+      - uv run ruff check --fix {{.SRC_DIR}}
       - echo "✅ Linting fixes applied"
 
   format:
     desc: "Format code with ruff"
     deps: [install-deps]
     sources:
-      - "./*.py"
+      - "{{.SRC_DIR}}/**/*.py"
     cmds:
-      - uv run ruff format .
+      - uv run ruff format {{.SRC_DIR}}
       - echo "✅ Code formatted"
 
   format-check:
     desc: "Check code formatting without making changes"
     deps: [install-deps]
     cmds:
-      - uv run ruff format --check .
+      - uv run ruff format --check {{.SRC_DIR}}
 
   # Pre-commit tasks
   pre-commit:
@@ -165,9 +166,11 @@ tasks:
       - echo "✅ Dependencies updated"
 
   # Exec app
-  run:
-    desc: "Execute the app"
+  run:*:
+    desc: "Execute an app"
     deps: [install-uv]
+    vars:
+      APP: "{{index .MATCH 0}}"
     cmds:
       - uv sync
-      - uv run streamlit run app.py
+      - uv run streamlit run src/{{.APP}}_app.py

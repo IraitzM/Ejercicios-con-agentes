@@ -1,3 +1,5 @@
+import os
+
 from langchain.agents import AgentExecutor, create_react_agent
 from langchain.memory import ConversationBufferMemory
 from langchain_openai import ChatOpenAI
@@ -8,6 +10,19 @@ from tools import get_circle_area, get_square_area
 from dotenv import load_dotenv
 
 load_dotenv(override=True)
+
+if "GOOGLE_API_KEY" in os.environ:
+    from langchain_google_genai import ChatGoogleGenerativeAI
+
+    llm = ChatGoogleGenerativeAI(
+        model="gemini-2.0-flash",
+        temperature=0,
+    )
+else:
+    from langchain_openai import ChatOpenAI
+
+    # Choose the LLM to use
+    llm = ChatOpenAI(model="gpt-4o", temperature=0)
 
 
 def create_main_agent():
@@ -49,9 +64,6 @@ def create_main_agent():
     # where to place the user input. If not, arises an error because there's ambiguity about whether "input" or "plan"
     # are the keys that should contain the new user input.
     memory = ConversationBufferMemory(memory_key="chat_history")
-
-    # Choose the LLM to use
-    llm = ChatOpenAI(model="gpt-4o", temperature=0)
 
     # Construct the ReAct agent
     main_agent = create_react_agent(llm, tools, prompt)
