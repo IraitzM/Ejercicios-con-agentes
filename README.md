@@ -44,7 +44,7 @@ Bien empleando `pip`
    ```bash
    pip install -r requirements.txt
    ```
-O `uv`
+   o `uv`
    ```bash
    uv sync
    ```
